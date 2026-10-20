@@ -1,23 +1,23 @@
 import 'package:flutter/foundation.dart';
 
-import '../models/author.dart';
-import '../models/author_query.dart';
+import '../models/florist.dart';
+import '../models/florist_query.dart';
 import '../models/page_result.dart';
-import '../repositories/author_repository.dart';
+import '../repositories/florist_repository.dart';
 import 'load_status.dart';
 
-class AuthorListNotifier extends ChangeNotifier {
-  final AuthorRepository _repository;
+class FloristListNotifier extends ChangeNotifier {
+  final FloristRepository _repository;
 
-  AuthorListNotifier(this._repository);
+  FloristListNotifier(this._repository);
 
-  AuthorQuery _query = const AuthorQuery();
-  PageResult<Author> _result = PageResult.empty();
+  FloristQuery _query = const FloristQuery();
+  PageResult<Florist> _result = PageResult.empty();
   LoadStatus _status = LoadStatus.idle;
   String? _error;
 
-  AuthorQuery get query => _query;
-  PageResult<Author> get result => _result;
+  FloristQuery get query => _query;
+  PageResult<Florist> get result => _result;
   LoadStatus get status => _status;
   String? get error => _error;
 
@@ -29,13 +29,13 @@ class AuthorListNotifier extends ChangeNotifier {
       _result = await _repository.find(_query);
       _status = LoadStatus.success;
     } catch (e) {
-      _error = 'Не удалось загрузить список авторов: $e';
+      _error = 'Не удалось загрузить список флористов: $e';
       _status = LoadStatus.error;
     }
     notifyListeners();
   }
 
-  Future<void> applyQuery(AuthorQuery next) async {
+  Future<void> applyQuery(FloristQuery next) async {
     _query = next;
     await load();
   }
@@ -44,7 +44,7 @@ class AuthorListNotifier extends ChangeNotifier {
 
   Future<void> goToPage(int page) => applyQuery(_query.copyWith(page: page));
 
-  Future<Author?> findById(int id) => _repository.findById(id);
+  Future<Florist?> findById(int id) => _repository.findById(id);
 
-  Future<List<Author>> findByIds(List<int> ids) => _repository.findByIds(ids);
+  Future<List<Florist>> findByIds(List<int> ids) => _repository.findByIds(ids);
 }

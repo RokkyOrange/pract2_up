@@ -11,7 +11,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final network = context.watch<NetworkNotifier>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Библиотека — каталог')),
+      appBar: AppBar(title: const Text('Цветочный магазин — каталог')),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 520),
@@ -26,17 +26,17 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               _SectionCard(
-                icon: Icons.menu_book,
-                title: 'Книги',
-                subtitle: 'Список книг с поиском по названию и ISBN',
-                onTap: () => context.go('/books'),
+                icon: Icons.local_florist,
+                title: 'Букеты',
+                subtitle: 'Список букетов с поиском по названию и артикулу',
+                onTap: () => context.go('/bouquets'),
               ),
               const SizedBox(height: 12),
               _SectionCard(
                 icon: Icons.person,
-                title: 'Авторы',
-                subtitle: 'Список авторов с поиском по фамилии и стране',
-                onTap: () => context.go('/authors'),
+                title: 'Флористы',
+                subtitle: 'Список флористов с поиском по фамилии и городу',
+                onTap: () => context.go('/florists'),
               ),
               const SizedBox(height: 24),
               SwitchListTile(

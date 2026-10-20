@@ -1,24 +1,24 @@
 import 'package:flutter/foundation.dart';
 
-import '../models/book.dart';
-import '../models/book_query.dart';
+import '../models/bouquet.dart';
+import '../models/bouquet_query.dart';
 import '../models/page_result.dart';
-import '../repositories/book_repository.dart';
+import '../repositories/bouquet_repository.dart';
 import 'load_status.dart';
 
-class BookListNotifier extends ChangeNotifier {
-  final BookRepository _repository;
+class BouquetListNotifier extends ChangeNotifier {
+  final BouquetRepository _repository;
 
-  BookListNotifier(this._repository);
+  BouquetListNotifier(this._repository);
 
-  BookQuery _query = const BookQuery();
-  PageResult<Book> _result = PageResult.empty();
+  BouquetQuery _query = const BouquetQuery();
+  PageResult<Bouquet> _result = PageResult.empty();
   LoadStatus _status = LoadStatus.idle;
   String? _error;
   final Set<int> _selected = {};
 
-  BookQuery get query => _query;
-  PageResult<Book> get result => _result;
+  BouquetQuery get query => _query;
+  PageResult<Bouquet> get result => _result;
   LoadStatus get status => _status;
   String? get error => _error;
   Set<int> get selected => Set.unmodifiable(_selected);
@@ -32,13 +32,13 @@ class BookListNotifier extends ChangeNotifier {
       _result = await _repository.find(_query);
       _status = LoadStatus.success;
     } catch (e) {
-      _error = 'Не удалось загрузить список книг: $e';
+      _error = 'Не удалось загрузить список букетов: $e';
       _status = LoadStatus.error;
     }
     notifyListeners();
   }
 
-  Future<void> applyQuery(BookQuery next) async {
+  Future<void> applyQuery(BouquetQuery next) async {
     _query = next;
     _selected.clear(); // выделение теряет смысл при смене условий отбора
     await load();
@@ -59,9 +59,9 @@ class BookListNotifier extends ChangeNotifier {
     await load();
   }
 
-  /// Для карточки книги: отдельная выборка, список при этом не меняется.
-  Future<Book?> findById(int id) => _repository.findById(id);
+  /// Для карточки букета: отдельная выборка, список при этом не меняется.
+  Future<Bouquet?> findById(int id) => _repository.findById(id);
 
-  Future<List<Book>> findByAuthor(int authorId) =>
-      _repository.findByAuthor(authorId);
+  Future<List<Bouquet>> findByFlorist(int floristId) =>
+      _repository.findByFlorist(floristId);
 }

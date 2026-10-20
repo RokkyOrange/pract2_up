@@ -1,54 +1,45 @@
-class Author {
+class Florist {
   final int id;
   final String lastName;
   final String firstName;
   final String? middleName;
-  final String country;
-  final int birthYear;
+  final String city;
+  final int experienceYears;
   final DateTime? deletedAt;
 
-  const Author({
+  const Florist({
     required this.id,
     required this.lastName,
     required this.firstName,
     this.middleName,
-    required this.country,
-    required this.birthYear,
+    required this.city,
+    required this.experienceYears,
     this.deletedAt,
   });
 
   bool get isDeleted => deletedAt != null;
 
-  /// Толстой Лев Николаевич
+  /// Иванова Анна Сергеевна
   String get fullName =>
       [lastName, firstName, if (middleName != null) middleName].join(' ');
 
-  /// Толстой Л. Н.
-  String get shortName {
-    final initials = [
-      '${firstName[0]}.',
-      if (middleName != null) '${middleName![0]}.',
-    ].join(' ');
-    return '$lastName $initials';
-  }
-
-  Author copyWith({
+  Florist copyWith({
     int? id,
     String? lastName,
     String? firstName,
     String? middleName,
-    String? country,
-    int? birthYear,
+    String? city,
+    int? experienceYears,
     DateTime? deletedAt,
     bool clearDeletedAt = false,
   }) {
-    return Author(
+    return Florist(
       id: id ?? this.id,
       lastName: lastName ?? this.lastName,
       firstName: firstName ?? this.firstName,
       middleName: middleName ?? this.middleName,
-      country: country ?? this.country,
-      birthYear: birthYear ?? this.birthYear,
+      city: city ?? this.city,
+      experienceYears: experienceYears ?? this.experienceYears,
       deletedAt: clearDeletedAt ? null : (deletedAt ?? this.deletedAt),
     );
   }

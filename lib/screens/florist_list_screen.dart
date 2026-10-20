@@ -2,40 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../models/book.dart';
-import '../models/dictionaries.dart';
-import '../state/book_list_notifier.dart';
+import '../models/florist.dart';
+import '../state/florist_list_notifier.dart';
 import '../state/load_status.dart';
 import '../widgets/load_state_view.dart';
+import '../widgets/format.dart';
 import '../widgets/offline_toggle.dart';
 import '../widgets/pagination_bar.dart';
 import '../widgets/search_field.dart';
 
-class BookListScreen extends StatefulWidget {
-  const BookListScreen({super.key});
+class FloristListScreen extends StatefulWidget {
+  const FloristListScreen({super.key});
 
   @override
-  State<BookListScreen> createState() => _BookListScreenState();
+  State<FloristListScreen> createState() => _FloristListScreenState();
 }
 
-class _BookListScreenState extends State<BookListScreen> {
+class _FloristListScreenState extends State<FloristListScreen> {
   @override
   void initState() {
     super.initState();
-    // Данные перезапрашиваются при каждом открытии экрана
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => context.read<BookListNotifier>().load(),
+      (_) => context.read<FloristListNotifier>().load(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final notifier = context.watch<BookListNotifier>();
+    final notifier = context.watch<FloristListNotifier>();
     final search = notifier.query.search;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Книги'),
+        title: const Text('Флористы'),
         leading: IconButton(
           tooltip: 'На главную',
           icon: const Icon(Icons.home),
@@ -57,7 +56,7 @@ class _BookListScreenState extends State<BookListScreen> {
             children: [
               SearchField(
                 initialText: search,
-                hint: 'Название или ISBN, затем Enter',
+                hint: 'Фамилия или город, затем Enter',
                 onSearch: notifier.search,
               ),
               Expanded(
@@ -68,15 +67,15 @@ class _BookListScreenState extends State<BookListScreen> {
                   onRetry: notifier.load,
                   emptyTitle: 'Ничего не найдено',
                   emptyMessage: search.isEmpty
-                      ? 'В каталоге пока нет книг'
-                      : 'По запросу «$search» книг не найдено',
+                      ? 'В магазине пока нет флористов'
+                      : 'По запросу «$search» флористов не найдено',
                   onResetSearch:
                       search.isEmpty ? null : () => notifier.search(''),
                   builder: (context) => ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: notifier.result.items.length,
                     itemBuilder: (context, i) =>
-                        _BookTile(book: notifier.result.items[i]),
+                        _FloristTile(florist: notifier.result.items[i]),
                   ),
                 ),
               ),
@@ -94,28 +93,22 @@ class _BookListScreenState extends State<BookListScreen> {
   }
 }
 
-class _BookTile extends StatelessWidget {
-  final Book book;
+class _FloristTile extends StatelessWidget {
+  final Florist florist;
 
-  const _BookTile({required this.book});
+  const _FloristTile({required this.florist});
 
   @override
   Widget build(BuildContext context) {
-    final genres = book.genreIds.map((id) => genreNames[id] ?? '?').join(', ');
-    final publisher = publisherNames[book.publisherId] ?? '?';
     return Card(
       child: ListTile(
-        leading: const CircleAvatar(child: Icon(Icons.menu_book)),
-        title: Text(book.title),
+        leading: CircleAvatar(child: Text(florist.lastName[0])),
+        title: Text(florist.fullName),
         subtitle: Text(
-          '${book.year} г. · $genres · $publisher\nISBN ${book.isbn}',
+          '${florist.city} · стаж ${formatYears(florist.experienceYears)}',
         ),
-        isThreeLine: true,
-        trailing: Text(
-          'В наличии\n${book.copiesAvailable} из ${book.copiesTotal}',
-          textAlign: TextAlign.end,
-        ),
-        onTap: () => context.go('/books/${book.id}'),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => context.go('/florists/${florist.id}'),
       ),
     );
   }

@@ -2,38 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../models/author.dart';
-import '../state/author_list_notifier.dart';
+import '../models/bouquet.dart';
+import '../models/dictionaries.dart';
+import '../state/bouquet_list_notifier.dart';
 import '../state/load_status.dart';
 import '../widgets/load_state_view.dart';
 import '../widgets/offline_toggle.dart';
 import '../widgets/pagination_bar.dart';
+import '../widgets/format.dart';
 import '../widgets/search_field.dart';
 
-class AuthorListScreen extends StatefulWidget {
-  const AuthorListScreen({super.key});
+class BouquetListScreen extends StatefulWidget {
+  const BouquetListScreen({super.key});
 
   @override
-  State<AuthorListScreen> createState() => _AuthorListScreenState();
+  State<BouquetListScreen> createState() => _BouquetListScreenState();
 }
 
-class _AuthorListScreenState extends State<AuthorListScreen> {
+class _BouquetListScreenState extends State<BouquetListScreen> {
   @override
   void initState() {
     super.initState();
+    // Данные перезапрашиваются при каждом открытии экрана
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => context.read<AuthorListNotifier>().load(),
+      (_) => context.read<BouquetListNotifier>().load(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final notifier = context.watch<AuthorListNotifier>();
+    final notifier = context.watch<BouquetListNotifier>();
     final search = notifier.query.search;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Авторы'),
+        title: const Text('Букеты'),
         leading: IconButton(
           tooltip: 'На главную',
           icon: const Icon(Icons.home),
@@ -55,7 +58,7 @@ class _AuthorListScreenState extends State<AuthorListScreen> {
             children: [
               SearchField(
                 initialText: search,
-                hint: 'Фамилия или страна, затем Enter',
+                hint: 'Название или артикул, затем Enter',
                 onSearch: notifier.search,
               ),
               Expanded(
@@ -66,15 +69,15 @@ class _AuthorListScreenState extends State<AuthorListScreen> {
                   onRetry: notifier.load,
                   emptyTitle: 'Ничего не найдено',
                   emptyMessage: search.isEmpty
-                      ? 'В каталоге пока нет авторов'
-                      : 'По запросу «$search» авторов не найдено',
+                      ? 'В каталоге пока нет букетов'
+                      : 'По запросу «$search» букетов не найдено',
                   onResetSearch:
                       search.isEmpty ? null : () => notifier.search(''),
                   builder: (context) => ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: notifier.result.items.length,
                     itemBuilder: (context, i) =>
-                        _AuthorTile(author: notifier.result.items[i]),
+                        _BouquetTile(bouquet: notifier.result.items[i]),
                   ),
                 ),
               ),
@@ -92,20 +95,36 @@ class _AuthorListScreenState extends State<AuthorListScreen> {
   }
 }
 
-class _AuthorTile extends StatelessWidget {
-  final Author author;
+class _BouquetTile extends StatelessWidget {
+  final Bouquet bouquet;
 
-  const _AuthorTile({required this.author});
+  const _BouquetTile({required this.bouquet});
 
   @override
   Widget build(BuildContext context) {
+    final categories =
+        bouquet.categoryIds.map((id) => categoryNames[id] ?? '?').join(', ');
     return Card(
       child: ListTile(
-        leading: CircleAvatar(child: Text(author.lastName[0])),
-        title: Text(author.fullName),
-        subtitle: Text('${author.country} · ${author.birthYear} г. р.'),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () => context.go('/authors/${author.id}'),
+        leading: const CircleAvatar(child: Icon(Icons.local_florist)),
+        title: Text(bouquet.name),
+        subtitle: Text(
+          '${bouquet.flowersCount} цв. · $categories\n'
+          'Артикул ${bouquet.sku}',
+        ),
+        isThreeLine: true,
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              formatPrice(bouquet.price),
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Text('в наличии: ${bouquet.stockAvailable}'),
+          ],
+        ),
+        onTap: () => context.go('/bouquets/${bouquet.id}'),
       ),
     );
   }
